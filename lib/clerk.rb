@@ -1,17 +1,28 @@
 require 'csv'
 
 class Clerk 
-  def initialize(template)
-    @template = template
+  attr_accessor :template 
+
+  def initialize(tpl = nil)
+    self.template = tpl
   end
 
-  def process(data)
+  def process_file(path)
+    require_template!
+    CSV.open(path, 'r').map do |line|
+      organize(line)
+    end
+  end
+
+  def process_data(data)
+    require_template!
     CSV.parse(data).map do |line|
       organize(line)
     end
   end
 
   def organize(line)
+    require_template!
     result = Hash.new
     @template.each_with_index do |key, index|
       case key
@@ -28,6 +39,10 @@ class Clerk
   end
 
   private 
+
+  def require_template!
+    raise 'A template is required to process your paperwork!' if @template.nil?
+  end
 
   def named_value(key, value)
     Hash[key, value]
