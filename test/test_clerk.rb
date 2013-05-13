@@ -2,7 +2,17 @@ require 'test/unit'
 require 'clerk'
 
 class ClerkTest < Test::Unit::TestCase
-  # Test organize
+  def test_template_requirement 
+    c = Clerk.new
+    assert_raise RuntimeError do
+      c.process %w(test data)
+    end
+
+    assert_raise RuntimeError do
+      c.organize %w(test data)
+    end
+  end
+
   def test_named 
     template = [:a]
     csv = %w(test)
@@ -39,7 +49,7 @@ class ClerkTest < Test::Unit::TestCase
   end
 
   def assert_transformation(template, values, result)
-    fl = Clerk.new template
-    assert_equal fl.organize(values), result
+    c = Clerk.new template
+    assert_equal c.organize(values), result
   end
 end
