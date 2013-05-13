@@ -14,7 +14,7 @@ class Clerk
     end
   end
 
-  def process_data(data)
+  def process(data)
     require_template!
     CSV.parse(data).map do |line|
       organize(line)
@@ -23,6 +23,7 @@ class Clerk
 
   def organize(line)
     require_template!
+    line = line.split(',') if line.instance_of? String
     result = Hash.new
     @template.each_with_index do |key, index|
       case key

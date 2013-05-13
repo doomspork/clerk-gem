@@ -48,6 +48,13 @@ class ClerkTest < Test::Unit::TestCase
     assert_transformation template, csv, res
   end
 
+  def test_string_input
+    template = [:a, nil, :b]
+    csv = 'test,ignored,value'
+    res = {:a => 'test', :b => 'value'}
+    assert_transformation template, csv, res
+  end
+
   def assert_transformation(template, values, result)
     c = Clerk.new template
     assert_equal c.organize(values), result
