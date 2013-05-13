@@ -55,6 +55,7 @@ class Clerk
     slice_size = value_keys.length
     groups = Array.new
     values.each_slice(slice_size).each do |group|
+      group = group + [nil] * (value_keys.length - group.length) if group.length < value_keys.length
       keyed_group = Hash.new
       group.each_with_index do |value, index|
         keyed_group[value_keys[index]] = value
