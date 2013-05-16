@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
   s.description = ''
   s.email       = ['callan@liftopia.com', 'jeff@liftopia.com']
   s.files       = ['lib/clerk.rb']
-  s.add_dependency('activemodel', '~> 2.3.13')
+  s.add_dependency('activemodel', '~> 3.2.13')
 end
