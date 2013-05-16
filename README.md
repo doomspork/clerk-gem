@@ -1,6 +1,6 @@
 # Clerk
 
-Clerk is that helpful cube jocky who helps transform your CSV input into a structured object collection.
+Clerk is that helpful cube jocky who transform your CSV input into a structured object collection.
 
 ### How to use
 
