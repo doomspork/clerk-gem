@@ -3,70 +3,70 @@ require 'clerk/template'
 
 class ClerkTemplateTest < Test::Unit::TestCase
   def setup
-    @t = Clerk::Template.new
+    @template = Clerk::Template.new
   end
 
   def teardown
-    @t = nil
+    @template = nil
   end
 
   def test_named_param_added_to_template
-    @t.named :param
-    assert_equal [:param], @t.arr
+    @template.named :param
+    assert_equal [:param], @template.template_array
   end
 
   def test_named_with_position
-    @t.named :a, :position => 2
-    assert_equal [nil, :a], @t.arr
+    @template.named :a, :position => 2
+    assert_equal [nil, :a], @template.template_array
   end
 
   def test_named_position_raises_exception_if_not_integer
     assert_raise TypeError do     
-      @t.named :a, :position => "Not an integer"
+      @template.named :a, :position => "Not an integer"
       "TypeError not raised when position was not integer"
     end
   end
 
   def test_named_position_raises_indexerror_for_position_zero
     assert_raise IndexError do
-      @t.named :a, :position => 0
+      @template.named :a, :position => 0
       "IndexError not raised when position is zero"
     end
   end
 
   def test_named_with_position_overwrites_existing
-    @t.named :b, :position => 2
-    @t.named :c
-    assert_equal [nil, :b, :c], @t.arr
+    @template.named :b, :position => 2
+    @template.named :c
+    assert_equal [nil, :b, :c], @template.template_array
 
-    @t.named :a, :position => 1
-    assert_equal [:a, :b, :c], @t.arr
+    @template.named :a, :position => 1
+    assert_equal [:a, :b, :c], @template.template_array
   end
 
   def test_named_with_position_expands_existing
-    @t.named :a
-    @t.named :b, :position => 3
-    assert_equal [:a, nil, :b], @t.arr
+    @template.named :a
+    @template.named :b, :position => 3
+    assert_equal [:a, nil, :b], @template.template_array
   end
 
   def test_ignored_adds_nil_to_template
-    @t.ignored
-    assert_equal [nil], @t.arr
+    @template.ignored
+    assert_equal [nil], @template.template_array
   end
 
   def test_grouped_adds_group_hash_to_template
-    @t.grouped :group_name, [ :a, :b ]  
+    @template.grouped :group_name, [ :a, :b ]  
     expected = {
       :group_name => [:a, :b]
     }
-    assert_equal [expected], @t.arr
+    assert_equal [expected], @template.template_array
   end
 
   def test_multiple_templated_parameters
-    @t.named :a
-    @t.ignored
-    @t.named :b
-    @t.grouped :c, [ :d, :e ]
+    @template.named :a
+    @template.ignored
+    @template.named :b
+    @template.grouped :c, [ :d, :e ]
 
     expected = [
       :a,
@@ -75,7 +75,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
       { :c => [ :d, :e ] },
     ]
 
-    assert_equal expected, @t.arr
+    assert_equal expected, @template.template_array
   end
 
   # TODO implement

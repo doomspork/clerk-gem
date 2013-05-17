@@ -3,10 +3,10 @@ module Clerk
   # Template DSL for creating transformation templates which define
   # how lines of data are transformed into a structure by Clerk
   class Template
-    attr_accessor :arr
+    attr_accessor :template_array
 
     def initialize
-      @arr = []
+      @template_array = []
     end
 
     ##
@@ -18,8 +18,8 @@ module Clerk
     # transform that line to be a hash with the first key being
     # :message, you can use the named parameter as follows:
     #
-    #   t = Clerk::Template.new
-    #   t.named :message
+    #   template = Clerk::Template.new
+    #   template.named :message
     #
     # The resulting template will assign the first position to the
     # key :message in the resulting transformed hash.
@@ -30,9 +30,9 @@ module Clerk
         position = options[:position] - 1
         raise IndexError, "Position #{options[:position]} is invalid" if position < 0
 
-        @arr[position] = key
+        @template_array[position] = key
       else
-        @arr << key
+        @template_array << key
       end
     end
 
@@ -43,7 +43,7 @@ module Clerk
     # discarded on transformation, the ignored directive should be
     # used to ignore it in the resulting structure.
     def ignored
-      @arr << nil
+      @template_array << nil
     end
 
     ##
@@ -62,15 +62,15 @@ module Clerk
     # Using the following template will result in the hash that
     # follows the template.
     #
-    #   t = Clerk::Template.new
-    #   t.grouped :items, [ :price, :quantity ]
+    #   template = Clerk::Template.new
+    #   template.grouped :items, [ :price, :quantity ]
     #
     #   { :items => [
     #     { :price => "29.99", :quantity => 10  } ,
     #     { :price => "19.95", :quantity => 100 } ,
     #   ]}
     def grouped(name, groups)
-      @arr << { name => groups }
+      @template_array << { name => groups }
     end
   end
 end
