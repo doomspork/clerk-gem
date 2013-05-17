@@ -23,8 +23,12 @@ module Clerk
     #
     # The resulting template will assign the first position to the
     # key :message in the resulting transformed hash.
-    def named(key)
-      @arr << key
+    def named(key, options = {})
+      if options.has_key? :position
+        @arr[options[:position].to_i - 1] = key
+      else
+        @arr << key
+      end
     end
 
     ##
