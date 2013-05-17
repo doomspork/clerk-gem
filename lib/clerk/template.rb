@@ -25,7 +25,12 @@ module Clerk
     # key :message in the resulting transformed hash.
     def named(key, options = {})
       if options.has_key? :position
-        @arr[options[:position].to_i - 1] = key
+        raise TypeError, "'#{options[:position]}' is not an integer" unless options[:position].is_a? Integer
+
+        position = options[:position] - 1
+        raise IndexError, "Position #{options[:position]} is invalid" if position < 0
+
+        @arr[position] = key
       else
         @arr << key
       end

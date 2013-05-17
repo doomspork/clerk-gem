@@ -14,6 +14,22 @@ class ClerkTemplateTest < Test::Unit::TestCase
     assert_equal [nil, :a], t.arr
   end
 
+  def test_named_position_raises_exception_if_not_integer
+    assert_raise TypeError do     
+      t = Clerk::Template.new
+      t.named :a, :position => "Not an integer"
+      "TypeError not raised when position was not integer"
+    end
+  end
+
+  def test_named_position_raises_indexerror_for_position_zero
+    assert_raise IndexError do
+      t = Clerk::Template.new
+      t.named :a, :position => 0
+      "IndexError not raised when position is zero"
+    end
+  end
+
   def test_named_with_position_overwrites_existing
     t = Clerk::Template.new
     t.named :b, :position => 2
