@@ -5,7 +5,7 @@ module Clerk
     attr_accessor :options
 
     @parser_registry = Hash.new
-    
+
     def initialize(options = {})
       @options = options.freeze
     end
@@ -15,12 +15,11 @@ module Clerk
     end
 
     def self.register(sym, parser)
-      #TODO meaningful error message
-      raise ArgumentError, "Registered parsers must subclass Clerk::Parser"  if parser.kind_of? self.class
+      raise ArgumentError, "Registered parsers must subclass Clerk::Parser"  if parser < self.class
       @parser_registry[sym] = parser
     end
-   
-    def self.contains(sym)
+
+    def self.contains?(sym)
       !!lookup(sym)
     end
 

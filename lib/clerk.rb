@@ -7,4 +7,6 @@ module Clerk
   extend ActiveSupport::Autoload
 
   autoload :Base
+  autoload :Parser
+  autoload :Template
 end
