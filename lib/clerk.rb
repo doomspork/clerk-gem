@@ -5,6 +5,6 @@ ActiveSupport::Dependencies.autoload_paths += %w(clerk)
 
 module Clerk 
   extend ActiveSupport::Autoload
-  
-  autoload :AbstractParser
+
+  autoload :Base
 end
