@@ -78,8 +78,17 @@ class ClerkTemplateTest < Test::Unit::TestCase
     assert_equal expected, @template.template_array
   end
 
-  # TODO implement
-  def test_grouped_must_be_at_the_end_of_the_template
-    
+  def test_adding_named_after_group_raises_error
+    assert_raise Clerk::GroupedNotLastError do
+      @template.grouped :a, [ :b, :c ]
+      @template.named :d
+    end
+  end
+
+  def test_adding_ignored_after_group_raises_error
+    assert_raise Clerk::GroupedNotLastError do
+      @template.grouped :a, [ :b, :c ]
+      @template.ignored
+    end
   end
 end

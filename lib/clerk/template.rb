@@ -24,6 +24,7 @@ module Clerk
     # The resulting template will assign the first position to the
     # key :message in the resulting transformed hash.
     def named(key, options = {})
+      raise GroupedNotLastError if has_grouped_element?
       if options.has_key? :position
         raise TypeError, "'#{options[:position]}' is not an integer" unless options[:position].is_a? Integer
 
@@ -43,7 +44,19 @@ module Clerk
     # discarded on transformation, the ignored directive should be
     # used to ignore it in the resulting structure.
     def ignored
+      raise GroupedNotLastError if has_grouped_element?
       @template_array << nil
+    end
+
+    ##
+    # Helper method to see if a grouped element is in the template
+    #
+    # This is mainly used to verify that the grouped element is the
+    # last one added to the template. This might change in the future
+    # but Clerk currently doesn't support grouped elements followed
+    # by other elements
+    def has_grouped_element?
+      @template_array.any? { |i| i.kind_of? Hash }
     end
 
     ##
@@ -72,5 +85,8 @@ module Clerk
     def grouped(name, groups)
       @template_array << { name => groups }
     end
+  end
+
+  class GroupedNotLastError < Exception
   end
 end
