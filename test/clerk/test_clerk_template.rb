@@ -12,12 +12,12 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
   def test_named_param_added_to_template
     @template.named :param
-    assert_equal [:param], @template.template_array
+    assert_equal [:param], @template.to_a
   end
 
   def test_named_with_position
     @template.named :a, :position => 2
-    assert_equal [nil, :a], @template.template_array
+    assert_equal [nil, :a], @template.to_a
   end
 
   def test_named_position_raises_exception_if_not_integer
@@ -37,21 +37,21 @@ class ClerkTemplateTest < Test::Unit::TestCase
   def test_named_with_position_overwrites_existing
     @template.named :b, :position => 2
     @template.named :c
-    assert_equal [nil, :b, :c], @template.template_array
+    assert_equal [nil, :b, :c], @template.to_a
 
     @template.named :a, :position => 1
-    assert_equal [:a, :b, :c], @template.template_array
+    assert_equal [:a, :b, :c], @template.to_a
   end
 
   def test_named_with_position_expands_existing
     @template.named :a
     @template.named :b, :position => 3
-    assert_equal [:a, nil, :b], @template.template_array
+    assert_equal [:a, nil, :b], @template.to_a
   end
 
   def test_ignored_adds_nil_to_template
     @template.ignored
-    assert_equal [nil], @template.template_array
+    assert_equal [nil], @template.to_a
   end
 
   def test_grouped_adds_group_hash_to_template
@@ -59,7 +59,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
     expected = {
       :group_name => [:a, :b]
     }
-    assert_equal [expected], @template.template_array
+    assert_equal [expected], @template.to_a
   end
 
   def test_multiple_templated_parameters
@@ -75,7 +75,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
       { :c => [ :d, :e ] },
     ]
 
-    assert_equal expected, @template.template_array
+    assert_equal expected, @template.to_a
   end
 
   def test_adding_named_after_group_raises_error

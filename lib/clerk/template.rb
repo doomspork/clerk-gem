@@ -3,10 +3,12 @@ module Clerk
   # Template DSL for creating transformation templates which define
   # how lines of data are transformed into a structure by Clerk
   class Template
-    attr_accessor :template_array
-
     def initialize
       @template_array = []
+    end
+
+    def to_a
+      @template_array
     end
 
     ##
