@@ -11,13 +11,10 @@ module Clerk
       @data = CSV.parse(path, options)
     end
 
-    def each
-      line = @data.read_line
-      yield line if block_given? 
+    def each(&block)
+      @data.each(&block) 
     end
-
-    def enum_of
   end
 end
 
-Clerk::Parser.register(:csv, Clerk::CSVParser)
+Clerk::ParserRegistry.register(:csv, Clerk::CSVParser)
