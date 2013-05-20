@@ -7,7 +7,7 @@ module Clerk
     end
 
     def load(path)
-      @raw_values = self.class.parser.load(path).to_enum
+      @raw_values = self.class.parser.parse(path).to_enum
     end
 
     def results
@@ -19,19 +19,7 @@ module Clerk
     end
 
     def self.apply_template(data)
-      result = Hash.new
-      @template.each_with_index do |key, index|
-        case key
-        when NilClass
-          next
-        when Hash
-          value = self.group_values(key, data.slice(index..data.length)
-        else
-          value = Hash[key, data[value]]
-        end
-        result.merge! value
-      end
-      result
+      # Apply template through the transformer
     end
 
     ##
@@ -45,7 +33,7 @@ module Clerk
     end
 
     def self.parser(parser, *options)
-      parser = Clerk::Parser.lookup(parser.to_sym) if [Symbol, String].any? { |t| parser.kind_of? t }
+      parser = Clerk::ParserRegistry.lookup(parser.to_sym) if [Symbol, String].any? { |t| parser.kind_of? t }
       #TODO Should we enforce Clerk::Parser subclassing here?
       @parser = parser.new(options)
     end
