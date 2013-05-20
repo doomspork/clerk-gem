@@ -25,6 +25,15 @@ module Clerk
     #
     # The resulting template will assign the first position to the
     # key :message in the resulting transformed hash.
+    #
+    # * *Args* :
+    #   - +key+ -> the key value for this named element (String or Symbol)
+    #   - +options+ -> hash of options, ex., {:position => 3}
+    # * *Returns* :
+    #   - current template array
+    # * *Raises* :
+    #   - +Clerk::GroupedNotLastError+ -> if there is a grouped element in the template
+    #   - +TypeError+ -> if the position option is not an integer or is less than 1
     def named(key, options = {})
       raise GroupedNotLastError if has_grouped_element?
       if options.has_key? :position
@@ -45,6 +54,11 @@ module Clerk
     # If a specific piece of data within a given data line should be
     # discarded on transformation, the ignored directive should be
     # used to ignore it in the resulting structure.
+    #
+    # * *Returns* :
+    #   - current template array
+    # * *Raises* :
+    #   - +Clerk::GroupedNotLastError+ -> if there is a grouped element in the template
     def ignored
       raise GroupedNotLastError if has_grouped_element?
       @template_array << nil
@@ -84,6 +98,14 @@ module Clerk
     #     { :price => "29.99", :quantity => 10  } ,
     #     { :price => "19.95", :quantity => 100 } ,
     #   ]}
+    #
+    # * *Args* :
+    #   - +name+ -> the name to assign to the group, ex., +:logins+
+    #   - +groups+ -> grouped element names, ex., +[:date, :user_id]+
+    # * *Returns* :
+    #   - current template array
+    # * *Raises* :
+    #   - +TypeError+ -> if the +groups+ param is not an +Array+
     def grouped(name, groups)
       raise TypeError, "Second parameter 'groups' must be an array" unless groups.is_a? Array
       @template_array << { name => groups }
