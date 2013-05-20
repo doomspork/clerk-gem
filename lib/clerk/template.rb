@@ -85,6 +85,7 @@ module Clerk
     #     { :price => "19.95", :quantity => 100 } ,
     #   ]}
     def grouped(name, groups)
+      raise TypeError, "Second parameter 'groups' must be an array" unless groups.is_a? Array
       @template_array << { name => groups }
     end
   end

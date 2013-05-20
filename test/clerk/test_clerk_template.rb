@@ -49,6 +49,13 @@ class ClerkTemplateTest < Test::Unit::TestCase
     assert_equal [:a, nil, :b], @template.to_a
   end
 
+  def test_named_accepts_string_or_symbol
+    @template.named :a
+    @template.named 'date'
+    @template.named 'user', :position => 4
+    assert_equal [:a, 'date', nil, 'user'], @template.to_a
+  end
+
   def test_ignored_adds_nil_to_template
     @template.ignored
     assert_equal [nil], @template.to_a
@@ -60,6 +67,12 @@ class ClerkTemplateTest < Test::Unit::TestCase
       :group_name => [:a, :b]
     }
     assert_equal [expected], @template.to_a
+  end
+
+  def test_grouped_requires_array_param
+    assert_raise TypeError do
+      @template.grouped :group_name, "not_an_array"
+    end
   end
 
   def test_multiple_templated_parameters
