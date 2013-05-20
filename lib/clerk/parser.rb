@@ -10,8 +10,12 @@ module Clerk
       @options = options.freeze
     end
 
-    def each(&block)
-      raise NotImplementedError, "Subclasses must implement a each(&block) method"
+    def parse(path, options = {})
+      raise NotImplementedError, "Subclasses must implement a parse method"
+    end
+
+    def each
+      raise NotImplementedError, "Subclasses must implement a each method"
     end
 
     def self.register(sym, parser)

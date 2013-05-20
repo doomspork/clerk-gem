@@ -3,20 +3,20 @@ require 'csv'
 module Clerk
   class CSVParser < Clerk::Parser
  
-    def initialize(path, options = {})
-      super(params)
-      @path = path
-      open_file
+    def initialize(options = {})
+      super(options)
     end
 
-    def open_file(path)
-      @csv = CSV.open(path)
+    def parse(path, options = {})
+      @data = CSV.parse(path, options)
     end
 
-    def each(&block)
-      line = @csv.read_line
-      yield block(line)
+    def each
+      line = @data.read_line
+      yield line if block_given? 
     end
+
+    def enum_of
   end
 end
 
