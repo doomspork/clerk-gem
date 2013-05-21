@@ -2,20 +2,38 @@ module Clerk
   class Base
     include ActiveModel::Validations
 
-    class << self
-      attr_accessor :template, :parser
+    def initialize
+      @transformed_values = Array.new
+    end
+
+    def load(data)
+      @raw_values = data.freeze
+    end
+
+    def results
+      Enumerator.new do |yielder|
+        @transformed_values.each do |value|
+          yielder << value
+        end
+      end
+    end
+
+    def errors
+      @template.errors || []
+    end
+
+    def self.apply_template(data)
+      @raw_values.each_with_index do |value, index|
+        @transformed_values[index] ||= @template.apply(value)
+      end
     end
 
     def self.template
-      @template = Clerk::Template.new 
+      @template ||= Clerk::Template.new 
       #We could do `block_given?` here but it might be better to let it error if nothing is provided
       yield @template 
+      @template
     end
 
-    def self.parser(parser, *options)
-      parser = Clerk::Parser.lookup(parser.to_sym) if [Symbol, String].any? { |t| parser.kind_of? t }
-      #TODO Should we enforce Clerk::Parser subclassing here?
-      @parser = parser.new(options)
-    end
   end
 end
