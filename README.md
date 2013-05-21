@@ -22,13 +22,13 @@ data = "2013-05-10,Sir,Steve,Coding,5,Eating,10,Running,0"
 
 class MyClerk < Clerk::Base
   template do |t|
-    t.named :date
+    t.named :date, :transform => :to_date
     t.ignored
     t.named :name
-    t.grouped :skills, [:name, :level]
+    t.grouped(:skills) do |group|
+      group.named :name
+      group.named :level
   end
-
-  parser :csv
 end
 
 clerk = MyClerk.new 

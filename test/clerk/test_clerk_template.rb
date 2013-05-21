@@ -61,25 +61,26 @@ class ClerkTemplateTest < Test::Unit::TestCase
     assert_equal [nil], @template.to_a
   end
 
-  def test_grouped_adds_group_hash_to_template
-    @template.grouped :group_name, [ :a, :b ]  
+  def test_grouped_creates_template_group
+    @template.grouped(:group_name) do |group|
+        group.named :a
+        group.named :b
+    end
+
     expected = {
       :group_name => [:a, :b]
     }
     assert_equal [expected], @template.to_a
   end
 
-  def test_grouped_requires_array_param
-    assert_raise TypeError do
-      @template.grouped :group_name, "not_an_array"
-    end
-  end
-
   def test_multiple_templated_parameters
     @template.named :a
     @template.ignored
     @template.named :b
-    @template.grouped :c, [ :d, :e ]
+    @template.grouped :c do |group|
+      group.named :d
+      group.named :e
+    end
 
     expected = [
       :a,
@@ -89,19 +90,5 @@ class ClerkTemplateTest < Test::Unit::TestCase
     ]
 
     assert_equal expected, @template.to_a
-  end
-
-  def test_adding_named_after_group_raises_error
-    assert_raise Clerk::GroupedNotLastError do
-      @template.grouped :a, [ :b, :c ]
-      @template.named :d
-    end
-  end
-
-  def test_adding_ignored_after_group_raises_error
-    assert_raise Clerk::GroupedNotLastError do
-      @template.grouped :a, [ :b, :c ]
-      @template.ignored
-    end
   end
 end

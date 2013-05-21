@@ -8,7 +8,12 @@ module Clerk
     end
 
     def to_a
-      @template_array
+      @template_array.map do |element|
+        if element.is_a? Clerk::TemplateGroup
+          element = element.to_hash
+        end
+        element
+      end
     end
 
     ##
@@ -72,7 +77,7 @@ module Clerk
     # but Clerk currently doesn't support grouped elements followed
     # by other elements
     def has_grouped_element?
-      @template_array.any? { |i| i.kind_of? Hash }
+      @template_array.any? { |i| i.kind_of? Clerk::TemplateGroup }
     end
 
     ##
@@ -104,12 +109,34 @@ module Clerk
     #   - +groups+ -> grouped element names, ex., +[:date, :user_id]+
     # * *Returns* :
     #   - current template array
-    # * *Raises* :
-    #   - +TypeError+ -> if the +groups+ param is not an +Array+
-    def grouped(name, groups)
-      raise TypeError, "Second parameter 'groups' must be an array" unless groups.is_a? Array
-      @template_array << { name => groups }
+    def grouped(name)
+      group = Clerk::TemplateGroup.new name
+      yield group
+      @template_array << group
     end
+  end
+
+  
+  class TemplateGroup
+    attr_accessor :name, :elements
+
+    def initialize(name, template = nil)
+      @name = name
+      @template = template || Clerk::Template.new
+    end
+
+    def to_hash
+      { @name => @template.to_a }
+    end
+
+    def method_missing(method, *args, &block)
+      if @template.respond_to?(method)
+        @template.send(method, *args, &block)
+      else
+        raise NoMethodError
+      end
+    end
+
   end
 
   class GroupedNotLastError < Exception
