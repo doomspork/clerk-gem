@@ -2,57 +2,85 @@ require 'test/unit'
 require 'clerk/template'
 
 class ClerkTemplateTest < Test::Unit::TestCase
+  def setup
+    @template = Clerk::Template.new
+  end
+
+  def teardown
+    @template = nil
+  end
+
   def test_named_param_added_to_template
-    t = Clerk::Template.new
-    t.named :param
-    assert_equal [:param], t.arr
+    @template.named :param
+    assert_equal [:param], @template.to_a
   end
 
   def test_named_with_position
-    t = Clerk::Template.new
-    t.named :a, :position => 2
-    assert_equal [nil, :a], t.arr
+    @template.named :a, :position => 2
+    assert_equal [nil, :a], @template.to_a
+  end
+
+  def test_named_position_raises_exception_if_not_integer
+    assert_raise TypeError do     
+      @template.named :a, :position => "Not an integer"
+      "TypeError not raised when position was not integer"
+    end
+  end
+
+  def test_named_position_raises_indexerror_for_position_zero
+    assert_raise IndexError do
+      @template.named :a, :position => 0
+      "IndexError not raised when position is zero"
+    end
   end
 
   def test_named_with_position_overwrites_existing
-    t = Clerk::Template.new
-    t.named :b, :position => 2
-    t.named :c
-    assert_equal [nil, :b, :c], t.arr
+    @template.named :b, :position => 2
+    @template.named :c
+    assert_equal [nil, :b, :c], @template.to_a
 
-    t.named :a, :position => 1
-    assert_equal [:a, :b, :c], t.arr
+    @template.named :a, :position => 1
+    assert_equal [:a, :b, :c], @template.to_a
   end
 
   def test_named_with_position_expands_existing
-    t = Clerk::Template.new
-    t.named :a
-    t.named :b, :position => 3
-    assert_equal [:a, nil, :b], t.arr
+    @template.named :a
+    @template.named :b, :position => 3
+    assert_equal [:a, nil, :b], @template.to_a
+  end
+
+  def test_named_accepts_string_or_symbol
+    @template.named :a
+    @template.named 'date'
+    @template.named 'user', :position => 4
+    assert_equal [:a, 'date', nil, 'user'], @template.to_a
   end
 
   def test_ignored_adds_nil_to_template
-    t = Clerk::Template.new
-    t.ignored
-    assert_equal [nil], t.arr
+    @template.ignored
+    assert_equal [nil], @template.to_a
   end
 
-  def test_grouped_adds_group_hash_to_template
-    t = Clerk::Template.new
-    t.grouped :group_name, [ :a, :b ]  
+  def test_grouped_creates_template_group
+    @template.grouped(:group_name) do |group|
+        group.named :a
+        group.named :b
+    end
+
     expected = {
       :group_name => [:a, :b]
     }
-    assert_equal [expected], t.arr
+    assert_equal [expected], @template.to_a
   end
 
   def test_multiple_templated_parameters
-    t = Clerk::Template.new
-
-    t.named :a
-    t.ignored
-    t.named :b
-    t.grouped :c, [ :d, :e ]
+    @template.named :a
+    @template.ignored
+    @template.named :b
+    @template.grouped :c do |group|
+      group.named :d
+      group.named :e
+    end
 
     expected = [
       :a,
@@ -61,11 +89,6 @@ class ClerkTemplateTest < Test::Unit::TestCase
       { :c => [ :d, :e ] },
     ]
 
-    assert_equal expected, t.arr
-  end
-
-  # TODO implement
-  def test_grouped_must_be_at_the_end_of_the_template
-    
+    assert_equal expected, @template.to_a
   end
 end
