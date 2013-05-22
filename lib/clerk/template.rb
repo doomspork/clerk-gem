@@ -139,6 +139,5 @@ module Clerk
 
   end
 
-  class GroupedNotLastError < Exception
-  end
+  class GroupedNotLastError < Exception; end
 end
