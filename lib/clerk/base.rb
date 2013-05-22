@@ -1,9 +1,11 @@
+require 'pp'
 module Clerk
   class ResultSet
     include ActiveModel::Validations
 
     def initialize(data)
       @data = data.freeze
+      pp @data
     end
 
     def read_attribute_for_validation(attribute)
@@ -47,7 +49,7 @@ module Clerk
       self
     end
 
-    def valid?
+    def valid?(*args)
       @transformed_values.all? do |sets| 
         sets.all? { |set| set.valid? } 
       end
@@ -79,10 +81,11 @@ module Clerk
     private
 
     def self.result_sets(record)
-      data = record.freeze
+      data = record.dup
       sets = Array.new
       if template.has_grouped_element?
-        grouped_data = data.reject! { |key, value| value.kind_of? Clerk::TemplateGroup }
+        grouped_data = data.select { |key, value| value.kind_of? Array }
+        grouped_data.keys.each { |key| data.delete(key) }
         grouped_data.each do |key, values|
           values.each do |value|
             sets.push _result_set_klass.new(data.merge(value))
