@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'clerk/base'
 
-class ClerkBaseTest < Test::Unit::TestCase
+class ClerkValidationTest < Test::Unit::TestCase
   def test_validation_of_template_named_value
     klass = Class.new(Clerk::Base) 
     klass.template do |t| 
