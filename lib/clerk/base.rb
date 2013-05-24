@@ -1,31 +1,7 @@
-require 'pp'
 module Clerk
-  class ResultSet
-    include ActiveModel::Validations
-
-    def initialize(data)
-      @data = data.freeze
-      pp @data
-    end
-
-    def read_attribute_for_validation(attribute)
-      @data[attribute]
-    end
-
-    def self.name
-      self.class.to_s
-    end
-
-    def self.copy_validations_from(klass)
-      dup = klass.validators.dup
-      dup.each do |validator|
-        validates_with validator.class, validator.options.dup.merge({:attributes => validator.attributes.dup})
-      end
-    end
-  end
-
   class Base
     include ActiveModel::Validations
+    include Clerk::Transformations
 
     class << self
       attr_accessor :_result_set_klass

@@ -7,5 +7,7 @@ module Clerk
   extend ActiveSupport::Autoload
 
   autoload :Base
+  autoload :ResultSet
+  autoload :Transformations
   autoload :Template
 end
