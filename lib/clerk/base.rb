@@ -1,11 +1,9 @@
-require 'pp'
 module Clerk
   class ResultSet
     include ActiveModel::Validations
 
     def initialize(data)
       @data = data.freeze
-      pp @data
     end
 
     def read_attribute_for_validation(attribute)
