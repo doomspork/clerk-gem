@@ -91,4 +91,63 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
     assert_equal expected, @template.to_a
   end
+
+  def test_apply_handles_named_params
+    @template.named :a
+    @template.named :b
+    expected = {
+      :a => "vala",
+      :b => "valb"
+    }
+
+    assert_equal expected, @template.apply(["vala", "valb"])
+  end
+
+  def test_apply_handles_ignored_params
+    @template.named :a
+    @template.ignored
+    @template.named :b
+
+    expected = {
+      :a => "valuea",
+      :b => "valueb"
+    }
+
+    assert_equal expected, @template.apply(["valuea", "valueignored", "valueb"])
+  end
+
+  def test_apply_handles_grouped_params
+    @template.grouped :a do |group|
+      group.named :b
+      group.named :c
+    end
+
+    expected = {
+      :a => [
+        { :b => "b1", :c => "c1" },
+        { :b => "b2", :c => "c2" }
+      ]
+    }
+
+    assert_equal expected, @template.apply(["b1","c1","b2","c2"])
+  end
+
+  def test_apply_fills_groups_with_null_when_data_length_does_not_match
+    @template.grouped :a do |group|
+      group.named :b
+      group.named :c
+    end
+
+    expected = {
+      :a => [
+        { :b => "b1", :c => "c1" },
+        { :b => "b2", :c => "c2" },
+        { :b => "b3", :c => nil  }
+      ]
+    }
+
+    data = [ "b1", "c1", "b2", "c2", "b3"]
+
+    assert_equal expected, @template.apply(data)
+  end
 end

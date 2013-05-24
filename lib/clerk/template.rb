@@ -17,6 +17,69 @@ module Clerk
     end
 
     ##
+    # Apply the template to the given data
+    #
+    # This method will take in an array of values and return a Hash representing
+    # that data structured according to the template. For example, suppose you have
+    # the following data and template defined.
+    #
+    #    template.named :a
+    #    template.ignored
+    #    template.grouped :c do |group|
+    #      group.named :d
+    #      group.named :e
+    #    end
+    #
+    #    data = ["a", "ignore", "d1", "e1", "d2", "e2"]
+    #
+    # The call to Template.apply would produce the following hash.
+    #
+    #   {
+    #     :a => "a",
+    #     :c => [
+    #       { :d => "d1", :e => "e1" },
+    #       { :d => "d2", :e => "e2" }
+    #     ]
+    #   }
+    #
+    # * *Args* :
+    #   - +data+ -> the data upon which the template should be applied
+    # * *Returns* :
+    #   - data structured into a Hash
+    def apply(data)
+      @structured_data = Hash.new
+
+      @template_array.each_with_index do |value,index|
+        case value
+        when NilClass
+          next
+        when Symbol
+          @structured_data[value] = data[index]
+        when TemplateGroup
+          template = value.template.to_a
+
+          data_group = Array.new
+
+          data[index, data.length].each_slice(template.length) do |slice|
+            grouped = Hash.new
+            if slice.length < template.length
+              slice.fill(nil, slice.length, template.length - 1)
+            end
+            slice.each_with_index do |element,idx|
+              grouped[template[idx]] = element
+            end
+
+            data_group << grouped
+          end
+
+          @structured_data[value.name] = data_group
+        end
+      end
+
+      @structured_data
+    end
+
+    ##
     # Add a named parameter to the template.
     #
     # The named parameter represents a keyed element within the
@@ -118,7 +181,7 @@ module Clerk
 
   
   class TemplateGroup
-    attr_accessor :name, :elements
+    attr_accessor :name, :template
 
     def initialize(name, template = nil)
       @name = name
