@@ -12,10 +12,10 @@ class ClerkValidationTest < Test::Unit::TestCase
     klass.validates_presence_of :a
 
     clerk = klass.new
-    clerk.load([{:a => "A!", :b => "B!"}])
+    clerk.load %w(A B)
     assert clerk.valid?
 
-    clerk.load([{:a => "", :b => "B!"}])
+    clerk.load %W(#{} B)
     assert clerk.invalid?
   end
 
@@ -32,10 +32,10 @@ class ClerkValidationTest < Test::Unit::TestCase
     klass.validates_presence_of :ga
 
     clerk = klass.new
-    clerk.load([{:a => "A!", :group_name => [{:ga => "A!", :gb => "B!"}]}])
+    clerk.load %w(A GA GB)
     assert clerk.valid?
 
-    clerk.load([{:a => "A!", :group_name => [{:ga => "", :gb => "B!"}]}])
+    clerk.load %W(A #{} GB)
     assert clerk.invalid?
   end
 

@@ -38,11 +38,12 @@ module Clerk
 
     def load(data)
       clear_transformed_data!
-      raw_values = data.freeze
-      @transformed_values = raw_values.map do |record|
-        templated_data = self.class.apply_template(record) 
-        transformed_data = self.class.apply_transformations(templated_data)
-        self.class.result_sets(transformed_data)
+      data.freeze 
+      raw_data = [data] unless data[0].kind_of? Array
+      raw_data.each do |d| 
+        templated_data = self.class.apply_template(d)
+        sets = self.class.result_sets(templated_data)
+        @transformed_values.push self.class.apply_transformations(sets)
       end
       self
     end
@@ -63,7 +64,7 @@ module Clerk
     end
 
     def self.apply_template(data)
-      data
+      template.apply(data)
     end
 
     def self.apply_transformations(data)
