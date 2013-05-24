@@ -4,32 +4,36 @@ Clerk is that helpful cube jocky who transform your CSV input into a structured 
 
 ### How to use
 
-- Create an instance (which can optionally accept a template)
- 	
- 	`clerk = Clerk.new`
- 	
-- Provide a template (if necessary)
-	
-	`clerk.template = [:date, nil, :name, {:tickets => [:price, :quantity]]}`
-	
-- Do some processing 
-	- Process a file from path
+- Create a class which extends `Clerk::Base` and creates a template using the `Clerk::Template` DSL. For example:
 
-		`clerk.process_file(_path_to_csv_file_)`
-		
-	- Process a chunk of CSV data
-		
-		`clerk.process(csv_data)`
-	
-	- Organize a single CSV line
-	
-		`clerk.organize(csv_line)`
-
+```
+class MyClerk < Clerk::Base
+  template do |t|
+    t.named :date
+    t.ignored
+    t.named :product_id
+  end
+end
+```
+ 	
 ### Example
 ```
 data = "2013-05-10,Sir,Steve,Coding,5,Eating,10,Running,0"
-clerk = Clerk.new [:date, nil, :name, {:skills => [:name, :level]}]
-result = clerk.organize(data)
+
+class MyClerk < Clerk::Base
+  template do |t|
+    t.named :date, :transform => :to_date
+    t.ignored
+    t.named :name
+    t.grouped(:skills) do |group|
+      group.named :name
+      group.named :level
+  end
+end
+
+clerk = MyClerk.new 
+clerk.parser.open_file '/path/to/data.csv'
+
  => {:date=>"2013-05-10", 
  	 :name=>"Steve", 
  	 :skills=>[
@@ -42,15 +46,40 @@ result = clerk.organize(data)
 
 Clerk requires a template in order to properly transform your data, these templates can include name-value pairs, repeated groups, and ignored columns.
 
-- ##### Name-value pair
-	Template names can be defined as either a String or Symbol: `[:date, 'price']`
+##### Name-value pair
 
-- ##### Repeated group
-	Repeated groups are defined as a single keyed hash with an array of keys for the group.  The following group would match columns in groups of two to the keys `:name` and `:age`: `[{:group => [:name, :age]}]`
+Template names can be defined as either a String or Symbol: `[:date, 'price']`
 
-- ##### Ignored values
-	Just toss a `nil` into your template array and that column won't be present in the transformed object: `[:date, nil, :name]`
-	
+```
+template.named :date
+template.named 'price'
+```
+
+##### Repeated group
+
+Repeated groups are used to group sets of data together in an array of hashes. One example would be a list of people and their age in sequence like `Jeff,27,Bill,34,George,23`. To group these together you would use the `grouped` method as follows.
+
+
+`template.grouped :people, [:name, :age]`
+
+This grouping would yield the end result:
+
+```
+[{ :people => [
+  { :name => "Jeff",   :age => "27" },
+  { :name => "Bill",   :age => "34" },
+  { :name => "George", :age => "23" }]}]
+```
+
+##### Ignored values
+
+Using the `ignored` option you can specify that the corresponding data should be omitted form the transformed hash.
+
+```
+template.named :date
+template.ignored
+template.named :name
+```
 	
 ### (Known) Limitations
 
