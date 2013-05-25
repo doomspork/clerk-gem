@@ -2,6 +2,8 @@ module Clerk
   class ResultSet
     include ActiveModel::Validations
 
+    attr_accessor :data
+
     def initialize(data)
       @data = data.freeze
     end
@@ -47,6 +49,21 @@ module Clerk
       self
     end
 
+    def results
+      results = Array.new
+
+      if self.class.template.has_grouped_element?
+        results.concat hydrate_grouped_results @transformed_values
+      else
+        @transformed_values.each do |resultset|
+          results.concat resultset.map { |s| s.data }
+        end
+      end
+
+      results
+    end
+    
+
     def valid?(*args)
       @transformed_values.all? do |sets| 
         sets.all? { |set| set.valid? } 
@@ -63,7 +80,7 @@ module Clerk
     end
 
     def self.apply_template(data)
-      data
+      @template.apply data
     end
 
     def self.apply_transformations(data)
@@ -77,7 +94,6 @@ module Clerk
     end
 
     private
-
     def self.result_sets(record)
       data = record.dup
       sets = Array.new
@@ -95,8 +111,35 @@ module Clerk
       sets
     end
 
+    private
     def clear_transformed_data!
       @transformed_values = Array.new
+    end
+
+    private
+    def hydrate_grouped_results(values)
+      hydrated_results = Array.new
+
+      template_as_array = self.class.template.to_a 
+      group_hash = template_as_array.select { |x| x.kind_of? Hash }.shift
+      
+      group_name = group_hash.keys.first 
+      group_keys = group_hash[group_name]
+
+      values.each do |resultset|
+        first_group = resultset[0].data.dup
+        container = first_group.reject { |key,value| group_keys.include? key }
+
+        container[group_name] = Array.new
+        resultset.each do |set|
+          raw_data = set.data.dup
+          data = raw_data.keep_if { |key,value| group_keys.include? key }
+          container[group_name].push data
+        end
+        hydrated_results.push container
+      end
+
+      hydrated_results
     end
 
   end
