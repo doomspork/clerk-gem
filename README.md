@@ -1,25 +1,9 @@
 # Clerk
 
-Clerk is that helpful cube jocky who transform your CSV input into a structured object collection.
+Clerk is that helpful cube jocky who transforms your data into a structured, verified, and formatted object collection.
 
-### How to use
-
-- Create a class which extends `Clerk::Base` and creates a template using the `Clerk::Template` DSL. For example:
-
-```
-class MyClerk < Clerk::Base
-  template do |t|
-    t.named :date
-    t.ignored
-    t.named :product_id
-  end
-end
-```
- 	
 ### Example
 ```
-data = "2013-05-10,Sir,Steve,Coding,5,Eating,10,Running,0"
-
 class MyClerk < Clerk::Base
   template do |t|
     t.named :date, :transform => :to_date
@@ -29,10 +13,16 @@ class MyClerk < Clerk::Base
       group.named :name
       group.named :level
   end
+
+  validate_presence_of :date, :name
+  validates_numericality_of :level
 end
 
+data = %w(2013-05-10 Sir Steve Coding 5 Eating 10 Running 0)
+
 clerk = MyClerk.new 
-clerk.parser.open_file '/path/to/data.csv'
+clerk.load data
+clerk.results
 
  => {:date=>"2013-05-10", 
  	 :name=>"Steve", 
@@ -80,7 +70,13 @@ template.named :date
 template.ignored
 template.named :name
 ```
-	
+
+### Validations
+
+`Clerk::Base` includes `ActiveModel::Validations` so it's the same validators you've (probably) used before!  For documentation on the validators head over to `ActiveModel::Validations` API [docs](http://api.rubyonrails.org/classes/ActiveModel/Validations.html).
+
+```
+
 ### (Known) Limitations
 
 1. Only one repeated group is supported
