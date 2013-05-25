@@ -41,6 +41,7 @@ module Clerk
     def load(data)
       clear_transformed_data!
       data.freeze 
+      raw_data = data
       raw_data = [data] unless data[0].kind_of? Array
       raw_data.each do |d| 
         templated_data = self.class.apply_template(d)

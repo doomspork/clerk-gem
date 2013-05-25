@@ -56,7 +56,7 @@ class ClerkTest < Test::Unit::TestCase
     end
 
     clerk = klass.new
-    clerk.load([["A!", "I", "B!"]]);
+    clerk.load(["A!", "I", "B!"]);
 
     assert_equal [{:a => 'A!', :b => 'B!'}], clerk.results
   end
