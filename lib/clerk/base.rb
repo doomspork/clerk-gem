@@ -58,7 +58,7 @@ module Clerk
       results = Array.new
 
       if self.class.template.has_grouped_element?
-        results.concat hydrate_grouped_results @transformed_values
+        results.concat embiggen_grouped_results @transformed_values
       else
         @transformed_values.each do |resultset|
           results.concat resultset.map { |s| s.data }
@@ -123,29 +123,26 @@ module Clerk
     end
 
     private
-    def hydrate_grouped_results(values)
-      hydrated_results = Array.new
-
-      template_as_array = self.class.template.to_a 
-      group_hash = template_as_array.select { |x| x.kind_of? Hash }.shift
-      
-      group_name = group_hash.keys.first 
-      group_keys = group_hash[group_name]
+    def embiggen_grouped_results(values)
+      embiggened_results = Array.new
 
       values.each do |resultset|
-        first_group = resultset[0].data.dup
-        container = first_group.reject { |key,value| group_keys.include? key }
-
-        container[group_name] = Array.new
+        container = Hash.new
         resultset.each do |set|
-          raw_data = set.data.dup
-          data = raw_data.keep_if { |key,value| group_keys.include? key }
-          container[group_name].push data
+          container.merge!(set.data) do |key, old, nue|
+            if old.kind_of? Hash
+              [old, nue]
+            elsif old.kind_of? Array
+              old.push nue
+            else
+              nue
+            end 
+          end
         end
-        hydrated_results.push container
+        embiggened_results.push container
       end
 
-      hydrated_results
+      embiggened_results
     end
 
   end

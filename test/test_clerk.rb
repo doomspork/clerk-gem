@@ -60,4 +60,28 @@ class ClerkTest < Test::Unit::TestCase
 
     assert_equal [{:a => 'A!', :b => 'B!'}], clerk.results
   end
+
+  def test_clerk_does_not_overwrite_keys_with_same_name
+    klass = Class.new Clerk::Base
+    klass.template do |t|
+      t.named :a
+      t.grouped(:z) do |g|
+        g.named :a
+        g.named :b
+      end
+    end
+
+    clerk = klass.new
+    clerk.load %w(A AZ BZ AY BY)
+
+    expected = [{
+      :a => "A", 
+      :z => [
+        { :a => "AZ", :b => "BZ" }, 
+        { :a => "AY", :b => "BY" },
+      ]
+    }]
+
+    assert_equal expected, clerk.results
+  end
 end
