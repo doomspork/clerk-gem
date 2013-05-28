@@ -1,4 +1,3 @@
-require 'pry'
 module Clerk
   class ResultSet
     include ActiveModel::Validations
