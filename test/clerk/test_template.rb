@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'clerk/template'
 
-class ClerkTemplateTest < Test::Unit::TestCase
+class TestTemplate < Test::Unit::TestCase
   def setup
     @template = Clerk::Template.new
   end
