@@ -1,6 +1,5 @@
 module Clerk
   module Transformations
-
     def transform(record)
       dup = record.dup
       self.class.transformations.each do |field, transformers|
