@@ -2,6 +2,8 @@ module Clerk
   class ResultSet
     include ActiveModel::Validations
 
+    attr_accessor :data
+
     def initialize(data)
       @data = data.freeze
     end
@@ -42,6 +44,7 @@ module Clerk
     def load(data)
       clear_transformed_data!
       data.freeze 
+      raw_data = data
       raw_data = [data] unless data[0].kind_of? Array
       raw_data.each do |d| 
         templated_data = self.class.apply_template(d)
@@ -50,6 +53,21 @@ module Clerk
       end
       self
     end
+
+    def results
+      results = Array.new
+
+      if self.class.template.has_grouped_element?
+        results.concat embiggen_grouped_results @transformed_values
+      else
+        @transformed_values.each do |resultset|
+          results.concat resultset.map { |s| s.data }
+        end
+      end
+
+      results
+    end
+    
 
     def valid?(*args)
       @transformed_values.all? do |sets| 
@@ -81,7 +99,6 @@ module Clerk
     end
 
     private
-
     def self.result_sets(record)
       data = record.dup
       sets = Array.new
@@ -102,6 +119,28 @@ module Clerk
 
     def clear_transformed_data!
       @transformed_values = Array.new
+    end
+
+    def embiggen_grouped_results(values)
+      embiggened_results = Array.new
+
+      values.each do |resultset|
+        container = Hash.new
+        resultset.each do |set|
+          container.merge!(set.data) do |key, old, nue|
+            if old.kind_of? Hash
+              [old, nue]
+            elsif old.kind_of? Array
+              old.push nue
+            else
+              nue
+            end 
+          end
+        end
+        embiggened_results.push container
+      end
+
+      embiggened_results
     end
 
   end
