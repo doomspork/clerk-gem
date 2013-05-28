@@ -29,7 +29,7 @@ class ClerkValidationTest < Test::Unit::TestCase
       end
     end
   
-    klass.validates_presence_of :ga
+    klass.validates_presence_of :'group_name/ga'
 
     clerk = klass.new
     clerk.load %w(A GA GB)

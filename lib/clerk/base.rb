@@ -1,3 +1,4 @@
+require 'pry'
 module Clerk
   class ResultSet
     include ActiveModel::Validations
@@ -7,7 +8,10 @@ module Clerk
     end
 
     def read_attribute_for_validation(attribute)
-      @data[attribute]
+      parts = attribute.to_s.split('/')
+      parts.inject(@data) do |memo, value| 
+        memo[value] || memo[value.to_sym]  
+      end
     end
 
     def self.name
@@ -87,7 +91,8 @@ module Clerk
         grouped_data.keys.each { |key| data.delete(key) }
         grouped_data.each do |key, values|
           values.each do |value|
-            sets.push _result_set_klass.new(data.merge(value))
+            group = Hash[key, value]
+            sets.push _result_set_klass.new(data.merge(group))
           end
         end
       else
