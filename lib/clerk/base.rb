@@ -117,12 +117,10 @@ module Clerk
       sets
     end
 
-    private
     def clear_transformed_data!
       @transformed_values = Array.new
     end
 
-    private
     def embiggen_grouped_results(values)
       embiggened_results = Array.new
 
