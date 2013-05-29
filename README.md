@@ -49,17 +49,23 @@ template.named 'price'
 
 Repeated groups are used to group sets of data together in an array of hashes. One example would be a list of people and their age in sequence like `Jeff,27,Bill,34,George,23`. To group these together you would use the `grouped` method as follows.
 
-
-`template.grouped :people, [:name, :age]`
+```ruby
+template.grouped(:people) do |group|
+  group.named :name
+  group.named :age
+end
+```
 
 This grouping would yield the end result:
 
-```
+```ruby
 [{ :people => [
   { :name => "Jeff",   :age => "27" },
   { :name => "Bill",   :age => "34" },
   { :name => "George", :age => "23" }]}]
 ```
+
+Repeated groups internally make use of the Template DSL so the methods `named` and `ignored` are available. Clerk does not supported nested groups, so calling `group.grouped` is not allowed.
 
 ##### Ignored values
 
@@ -74,8 +80,6 @@ template.named :name
 ### Validations
 
 `Clerk::Base` includes `ActiveModel::Validations` so it's the same validators you've (probably) used before!  For documentation on the validators head over to `ActiveModel::Validations` API [docs](http://api.rubyonrails.org/classes/ActiveModel/Validations.html).
-
-```
 
 ### (Known) Limitations
 
