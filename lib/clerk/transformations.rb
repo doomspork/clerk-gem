@@ -1,26 +1,27 @@
 module Clerk
   module Transformations
     def transform(record)
-      dup = record.dup
       self.class.transformations.each do |field, transformers|
         orig_value = record.get(field)
         transformed_value = transformers.inject(orig_value) do |memo, transformer|
-          transformer.tranform(memo)
+          transformer.transform(memo)
         end
         record.set(field, transformed_value)
       end
+      record 
     end
 
     module ClassMethods
       def transforms(*fields, &block)
         klz = Class.new(BlockTransformer)
-        klz.block = block
-        transforms_with klz, fields
+        klz.block(&block)
+        transforms_with klz, *fields
       end
 
       def transforms_with(klass, *fields)
+        #TODO check klass for .transform method!
         fields.each do |field|
-          self.transformations[field].push(klass)
+          transformations[field].push(klass)
         end
       end
 
@@ -39,7 +40,7 @@ module Clerk
   end
 
   class BlockTransformer
-    def self.block=(&block)
+    def self.block(&block)
       @block = block
     end
 
