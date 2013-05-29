@@ -146,13 +146,17 @@ module Clerk
     # discarded on transformation, the ignored directive should be
     # used to ignore it in the resulting structure.
     #
+    # * *Args* :
+    #   - +num+ -> Number of columns to ignore [default = 1]
     # * *Returns* :
     #   - current template array
     # * *Raises* :
     #   - +Clerk::GroupedNotLastError+ -> if there is a grouped element in the template
-    def ignored
+    #   - +ArgumentError+ -> if number of columns is less than one
+    def ignored(num = 1)
       raise GroupedNotLastError if has_grouped_element?
-      @template_array << nil
+      raise ArgumentError if num < 1
+      @template_array.concat(Array.new(num))
     end
 
     ##
