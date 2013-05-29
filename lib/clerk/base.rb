@@ -14,6 +14,18 @@ module Clerk
       self.class._result_set_klass = result_klass
     end
 
+    ##
+    # Pass data off to your Clerk for processing
+    #
+    # This is the main method for giving data to Clerk which will then
+    # be transformed into the structure specified by the Template and
+    # according to any transformations specified for individual data
+    # elements/columns.
+    #
+    # * *Args* :
+    #   - +data+ -> Data which Clerk should act upon
+    # * *Returns* :
+    #   - self
     def load(data)
       clear_transformed_data!
       data = [data] unless data[0].kind_of? Array
@@ -28,6 +40,16 @@ module Clerk
       self
     end
 
+    ##
+    # Retrieves the transformed data from the Clerk
+    #
+    # Use this method to retrieve the final transformed data from the
+    # Clerk. This method should be called after you have verified the
+    # data passes validation described in your clerk using the `valid?`
+    # method.
+    #
+    # * *Returns* :
+    #   - Array containing each row of data in the described structure
     def results
       results = Array.new
 
@@ -42,12 +64,22 @@ module Clerk
       results
     end
 
+    ##
+    # Checks data against described Validators
+    #
+    # * *Returns* :
+    #   - Boolean true or false
     def valid?(*args)
       @transformed_values.all? do |sets| 
         sets.all? { |set| set.valid? } 
       end
     end
 
+    ##
+    # Used to retrieve validation error messages
+    #
+    # * *Returns* :
+    #   - Hash of error messages
     def errors
       error_messages = Hash.new
       @transformed_values.each_with_index do |sets, index|
@@ -111,6 +143,5 @@ module Clerk
 
       embiggened_results
     end
-
   end
 end
