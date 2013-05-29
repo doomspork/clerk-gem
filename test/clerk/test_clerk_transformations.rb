@@ -1,15 +1,26 @@
 require 'test/unit'
 require 'clerk/base'
 
-class TestClerk < Clerk::Base
-  template do |t| 
-    t.named :a 
-    t.named :b
-  end
-end
+class ClerkTransformationsTest < Test::Unit::TestCase
+  def test_transformation_of_named_value
+    klass = Class.new(Clerk::Base) 
+    klass.template do |t| 
+      t.named :a 
+      t.named :b
+    end
 
-class TestTransformation < Test::Unit::TestCase
-  def test_transformation_of_template_named_value
+    klass.transforms :a do |value|
+      value.upcase
+    end
 
+    clerk = klass.new
+    clerk.load %w(a b)
+
+    expected = {
+      :a => 'A',
+      :b => 'b'
+    }
+
+    assert_equal expected, clerk.results.first
   end
 end
