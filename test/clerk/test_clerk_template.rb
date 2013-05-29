@@ -63,8 +63,8 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
   def test_grouped_creates_template_group
     @template.grouped(:group_name) do |group|
-        group.named :a
-        group.named :b
+      group.named :a
+      group.named :b
     end
 
     expected = {
@@ -126,7 +126,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
       :a => [
         { :b => "b1", 'c' => "c1" },
         { :b => "b2", 'c' => "c2" }
-      ]
+    ]
     }
 
     assert_equal expected, @template.apply(["b1","c1","b2","c2"])
@@ -143,7 +143,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
         { :b => "b1", :c => "c1" },
         { :b => "b2", :c => "c2" },
         { :b => "b3", :c => nil  }
-      ]
+    ]
     }
 
     data = [ "b1", "c1", "b2", "c2", "b3"]
