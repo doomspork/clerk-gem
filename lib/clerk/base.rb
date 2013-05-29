@@ -1,3 +1,4 @@
+require 'pry'
 module Clerk
   class Base
     include ActiveModel::Validations
@@ -119,20 +120,22 @@ module Clerk
     end
 
     def clear_transformed_data!
-      @transformed_values = Array.new
+      @transformed_values = []
     end
 
     def embiggen_grouped_results(values)
-      embiggened_results = Array.new
-
+      embiggened_results = []
       values.each do |resultset|
-        container = Hash.new
+        container = {} 
         resultset.each do |set|
-          container.merge!(set.data) do |key, old, nue|
-            if old.kind_of? Hash
-              [old, nue]
-            elsif old.kind_of? Array
-              old.push nue
+          data = {}
+          set.data.each do |key, value|
+            value = [value] if value.kind_of? Hash
+            data[key] = value
+          end
+          container.merge!(data) do |key, old, nue|
+            if old.kind_of? Array
+              old.push nue.first
             else
               nue
             end 
