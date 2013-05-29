@@ -1,12 +1,35 @@
 module Clerk
   ##
-  # Template DSL for creating transformation templates which define
-  # how lines of data are transformed into a structure by Clerk
+  # Template DSL for creating structure templates which define
+  # how lines of input data are restructured by Clerk
   class Template
     def initialize
       @template_array = []
     end
 
+    ##
+    # Coercion method turn Clerk::Template into Array
+    #
+    # This method returns the Clerk::Template in an Array represntation which
+    # is useful for quick iteration over the structure in a simple way.
+    #
+    # Example, suppose you have defined a template in your Clerk instance which
+    # has a named element, and ignored element, and a set of grouped elements.
+    #
+    #   template.named :a
+    #   template.ignored
+    #   template.grouped(:b) do |group|
+    #     group.named :c
+    #     group.named :d
+    #   end
+    #
+    # Calling the Template.to_a method will return the template represented
+    # as the following array.
+    #
+    #   [:a, nil, {:b => [:c, :d]}]
+    #
+    # * *Returns* :
+    #   - template as an Array
     def to_a
       @template_array.map do |element|
         if element.is_a? Clerk::TemplateGroup
@@ -84,7 +107,7 @@ module Clerk
     #
     # The named parameter represents a keyed element within the
     # final data structure. For example, suppose there is a line
-    # of data containing a single element, hello, and you want to 
+    # of data containing a single element, hello, and you want to
     # transform that line to be a hash with the first key being
     # :message, you can use the named parameter as follows:
     #
@@ -160,7 +183,10 @@ module Clerk
     # follows the template.
     #
     #   template = Clerk::Template.new
-    #   template.grouped :items, [ :price, :quantity ]
+    #   template.grouped(:items) do |g|
+    #     g.named :price
+    #     g.named :quantity
+    #   end
     #
     #   { :items => [
     #     { :price => "29.99", :quantity => 10  } ,
@@ -169,7 +195,6 @@ module Clerk
     #
     # * *Args* :
     #   - +name+ -> the name to assign to the group, ex., +:logins+
-    #   - +groups+ -> grouped element names, ex., +[:date, :user_id]+
     # * *Returns* :
     #   - current template array
     def grouped(name)
@@ -179,7 +204,12 @@ module Clerk
     end
   end
 
-  
+  ##
+  # TemplateGroup defines grouped DSL
+  #
+  # Inside a template, to define a set of grouped elements, a
+  # conveninence DSL is provided through the Template.grouped
+  # method. Clerk::TemplateGroup exposes that DSL API.
   class TemplateGroup
     attr_accessor :name, :template
 
@@ -188,11 +218,37 @@ module Clerk
       @template = template || Clerk::Template.new
     end
 
+    ##
+    # Coercion from Clerk::TemplateGroup to Hash
+    #
+    # For example, given a grouped set of elements defined by the
+    # Template DSL:
+    #
+    #   template.grouped(:a) do |group|
+    #     group.named :b
+    #     group.named :c
+    #   end
+    #
+    # When the TemplateGroup.to_hash method is called, the resulting
+    # data structure will be:
+    #
+    #   {:a => [:b, :c]}
+    #
+    # * *Returns* :
+    #   - TemplateGroup as Hash
     def to_hash
       { @name => @template.to_a }
     end
 
+    ##
+    # Delegate method calls to Clerk::Template
+    #
+    # Since the DSL for grouped elements is effectively just a wrapper
+    # on top of Clerk::Template, calls to allowed methods are simply
+    # delegate to an internal instance of Clerk::Template.
     def method_missing(method, *args, &block)
+      raise NoMethodError if method === :grouped
+
       if @template.respond_to?(method)
         @template.send(method, *args, &block)
       else

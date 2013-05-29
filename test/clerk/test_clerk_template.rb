@@ -150,4 +150,29 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
     assert_equal expected, @template.apply(data)
   end
+
+  def test_to_a_coerces_template_to_array
+    @template.named :a
+    @template.ignored
+    @template.grouped(:b) do |group|
+      group.named :c
+      group.named :d
+    end
+
+    expected = [:a, nil, {:b => [:c, :d]}]
+
+    assert_equal expected, @template.to_a
+  end
+
+  def test_group_not_allowed_to_have_grouped_elements
+    assert_raise NoMethodError do
+      @template.grouped(:a) do |group|
+        group.named :b
+        group.grouped(:c) do |groupception|
+          groupception.named :d
+          groupception.named :e
+        end
+      end
+    end
+  end
 end
