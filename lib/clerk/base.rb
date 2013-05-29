@@ -1,4 +1,3 @@
-require 'pry'
 module Clerk
   class Base
     include ActiveModel::Validations
