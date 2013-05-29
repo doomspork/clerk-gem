@@ -61,6 +61,17 @@ class ClerkTemplateTest < Test::Unit::TestCase
     assert_equal [nil], @template.to_a
   end
 
+  def test_ignore_multiple_columns
+    @template.ignored 3
+    assert_equal [nil, nil, nil], @template.to_a
+  end
+
+  def test_ignore_requires_num_greater_than_zero
+    assert_raise ArgumentError do
+      @template.ignored 0
+    end
+  end
+
   def test_grouped_creates_template_group
     @template.grouped(:group_name) do |group|
       group.named :a
