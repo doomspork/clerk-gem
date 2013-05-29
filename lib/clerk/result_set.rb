@@ -16,7 +16,12 @@ module Clerk
     end
 
     def set(attribute, value)
-      @data[attribute] = value
+      parts = attribute.to_s.split('/')
+      lastkey = parts.pop
+      hash = parts.inject(@data) do |memo, value| 
+        memo[value.to_sym] 
+      end
+      hash[lastkey.to_sym] = value
     end
 
     def self.name
