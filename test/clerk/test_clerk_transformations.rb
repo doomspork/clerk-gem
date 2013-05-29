@@ -23,4 +23,30 @@ class ClerkTransformationsTest < Test::Unit::TestCase
 
     assert_equal expected, clerk.results.first
   end
+
+  def test_transformation_of_grouped_value
+    klass = Class.new(Clerk::Base) 
+    klass.template do |t| 
+      t.named :a 
+      t.grouped(:b) do |group|
+        group.named :c
+      end
+    end
+
+    klass.transforms :'b/c' do |value|
+      value.upcase
+    end
+
+    clerk = klass.new
+    clerk.load %w(a c)
+
+    expected = {
+      :a => 'a',
+      :b => [
+        {:c => 'C'}
+      ]
+    }
+
+    assert_equal expected, clerk.results.first
+  end
 end
