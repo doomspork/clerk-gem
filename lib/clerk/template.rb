@@ -53,7 +53,7 @@ module Clerk
         case value
         when NilClass
           next
-        when Symbol
+        when Symbol, String
           @structured_data[value] = data[index]
         when TemplateGroup
           template = value.template.to_a
@@ -202,6 +202,5 @@ module Clerk
 
   end
 
-  class GroupedNotLastError < Exception
-  end
+  class GroupedNotLastError < Exception; end
 end

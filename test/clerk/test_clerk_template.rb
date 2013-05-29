@@ -63,8 +63,8 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
   def test_grouped_creates_template_group
     @template.grouped(:group_name) do |group|
-        group.named :a
-        group.named :b
+      group.named :a
+      group.named :b
     end
 
     expected = {
@@ -94,10 +94,10 @@ class ClerkTemplateTest < Test::Unit::TestCase
 
   def test_apply_handles_named_params
     @template.named :a
-    @template.named :b
+    @template.named 'b'
     expected = {
       :a => "vala",
-      :b => "valb"
+      'b' => "valb"
     }
 
     assert_equal expected, @template.apply(["vala", "valb"])
@@ -106,11 +106,11 @@ class ClerkTemplateTest < Test::Unit::TestCase
   def test_apply_handles_ignored_params
     @template.named :a
     @template.ignored
-    @template.named :b
+    @template.named 'b'
 
     expected = {
       :a => "valuea",
-      :b => "valueb"
+      'b' => "valueb"
     }
 
     assert_equal expected, @template.apply(["valuea", "valueignored", "valueb"])
@@ -119,14 +119,14 @@ class ClerkTemplateTest < Test::Unit::TestCase
   def test_apply_handles_grouped_params
     @template.grouped :a do |group|
       group.named :b
-      group.named :c
+      group.named 'c'
     end
 
     expected = {
       :a => [
-        { :b => "b1", :c => "c1" },
-        { :b => "b2", :c => "c2" }
-      ]
+        { :b => "b1", 'c' => "c1" },
+        { :b => "b2", 'c' => "c2" }
+    ]
     }
 
     assert_equal expected, @template.apply(["b1","c1","b2","c2"])
@@ -143,7 +143,7 @@ class ClerkTemplateTest < Test::Unit::TestCase
         { :b => "b1", :c => "c1" },
         { :b => "b2", :c => "c2" },
         { :b => "b3", :c => nil  }
-      ]
+    ]
     }
 
     data = [ "b1", "c1", "b2", "c2", "b3"]
