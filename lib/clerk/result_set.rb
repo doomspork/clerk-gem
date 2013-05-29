@@ -2,12 +2,17 @@ module Clerk
   class ResultSet
     include ActiveModel::Validations
 
+    attr_accessor :data
+
     def initialize(data)
-      @data = data.freeze
+      @data = data.dup
     end
 
     def get(attribute)
-      @data[attribute]
+      parts = attribute.to_s.split('/')
+      parts.inject(@data) do |memo, value| 
+        memo[value.to_sym] || memo[value] 
+      end
     end
 
     def set(attribute, value)
@@ -19,9 +24,8 @@ module Clerk
     end
 
     def self.copy_validations_from(klass)
-      dup = klass.validators.dup
-      dup.each do |validator|
-        validates_with validator.class, validator.options.dup.merge({:attributes => validator.attributes.dup})
+      klass.validators.each do |validator|
+        validates_with validator.class, validator.options.merge({:attributes => validator.attributes})
       end
     end
 
