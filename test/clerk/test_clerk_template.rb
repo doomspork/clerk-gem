@@ -94,10 +94,10 @@ class TestTemplate < Test::Unit::TestCase
 
   def test_apply_handles_named_params
     @template.named :a
-    @template.named :b
+    @template.named 'b'
     expected = {
       :a => "vala",
-      :b => "valb"
+      'b' => "valb"
     }
 
     assert_equal expected, @template.apply(["vala", "valb"])
@@ -106,11 +106,11 @@ class TestTemplate < Test::Unit::TestCase
   def test_apply_handles_ignored_params
     @template.named :a
     @template.ignored
-    @template.named :b
+    @template.named 'b'
 
     expected = {
       :a => "valuea",
-      :b => "valueb"
+      'b' => "valueb"
     }
 
     assert_equal expected, @template.apply(["valuea", "valueignored", "valueb"])
@@ -119,13 +119,13 @@ class TestTemplate < Test::Unit::TestCase
   def test_apply_handles_grouped_params
     @template.grouped :a do |group|
       group.named :b
-      group.named :c
+      group.named 'c'
     end
 
     expected = {
       :a => [
-        { :b => "b1", :c => "c1" },
-        { :b => "b2", :c => "c2" }
+        { :b => "b1", 'c' => "c1" },
+        { :b => "b2", 'c' => "c2" }
       ]
     }
 

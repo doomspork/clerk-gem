@@ -16,13 +16,30 @@ module Clerk
 
     def load(data)
       clear_transformed_data!
-      raw_values = data.freeze
-      @transformed_values = raw_values.map do |record|
-        templated_data = self.class.apply_template(record) 
-        transformed_data = self.class.apply_transformations(templated_data)
-        self.class.result_sets(transformed_data)
+      data = [data] unless data[0].kind_of? Array
+      data.each do |data| 
+        templated_data = apply_template(data)
+        sets = result_sets(templated_data)
+        sets.map! do |set|
+          transform(set)
+        end
+        @transformed_values.push sets
       end
       self
+    end
+
+    def results
+      results = Array.new
+
+      if self.class.template.has_grouped_element?
+        results.concat embiggen_grouped_results @transformed_values
+      else
+        @transformed_values.each do |resultset|
+          results.concat resultset.map { |s| s.data }
+        end
+      end
+
+      results
     end
 
     def valid?(*args)
@@ -40,12 +57,8 @@ module Clerk
       error_messages
     end
 
-    def self.apply_template(data)
-      data
-    end
-
-    def self.apply_transformations(data)
-      data
+    def apply_template(data)
+      self.class.template.apply(data)
     end
 
     def self.template
@@ -55,26 +68,48 @@ module Clerk
     end
 
     private
-
-    def self.result_sets(record)
+    def result_sets(record)
       data = record.dup
       sets = Array.new
-      if template.has_grouped_element?
+      if self.class.template.has_grouped_element?
         grouped_data = data.select { |key, value| value.kind_of? Array }
         grouped_data.keys.each { |key| data.delete(key) }
         grouped_data.each do |key, values|
           values.each do |value|
-            sets.push _result_set_klass.new(data.merge(value))
+            group = Hash[key, value]
+            sets.push self.class._result_set_klass.new(data.merge(group))
           end
         end
       else
-        sets.push _result_set_klass.new(data)
+        sets.push self.class._result_set_klass.new(data)
       end
       sets
     end
 
     def clear_transformed_data!
       @transformed_values = Array.new
+    end
+
+    def embiggen_grouped_results(values)
+      embiggened_results = Array.new
+
+      values.each do |resultset|
+        container = Hash.new
+        resultset.each do |set|
+          container.merge!(set.data) do |key, old, nue|
+            if old.kind_of? Hash
+              [old, nue]
+            elsif old.kind_of? Array
+              old.push nue
+            else
+              nue
+            end 
+          end
+        end
+        embiggened_results.push container
+      end
+
+      embiggened_results
     end
 
   end
