@@ -127,4 +127,49 @@ class ClerkTest < Test::Unit::TestCase
 
     assert_equal expected, clerk.results
   end
+
+  def test_clerk_handles_no_group_data_when_group_defined
+    klass = Class.new Clerk::Base
+    klass.template do |t|
+      t.ignored
+      t.named :name
+      t.named :race
+      t.named :gender
+      t.named :class
+      t.ignored
+      t.grouped(:loot) do |g|
+        g.named :name
+        g.named :quantity
+      end
+    end
+
+    data = [
+      "1,Fhaemita Dewshining,Half-elf,Female,3,80".split(","),
+      "2,George,Full-elf,Male,2,20,Gold,100,Rubies,20".split(",")
+    ]
+
+    clerk = klass.new
+    clerk.load data
+
+    expected = [{
+        :name   => "Fhaemita Dewshining",
+        :race   => "Half-elf",
+        :gender => "Female",
+        :class  => "3",
+        :loot   => []
+      },
+      {
+        :name => "George",
+        :race => "Full-elf",
+        :gender => "Male",
+        :class=> "2", 
+        :loot => [
+          {:name => "Gold", :quantity => "100"},
+          {:name => "Rubies",:quantity => "20" }
+        ]
+      }
+    ]
+
+    assert_equal expected, clerk.results
+  end
 end
