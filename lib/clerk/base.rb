@@ -107,9 +107,13 @@ module Clerk
         grouped_data = data.select { |key, value| value.kind_of? Array }
         grouped_data.keys.each { |key| data.delete(key) }
         grouped_data.each do |key, values|
-          values.each do |value|
-            group = Hash[key, value]
-            sets.push self.class._result_set_klass.new(data.merge(group))
+          if values.empty?
+            sets.push self.class._result_set_klass.new(data.merge(Hash[key, []]))
+          else
+            values.each do |value|
+              group = Hash[key, value]
+              sets.push self.class._result_set_klass.new(data.merge(group))
+            end
           end
         end
       else
