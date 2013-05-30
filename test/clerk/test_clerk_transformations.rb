@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'clerk/base'
+require 'test_helper'
 
 class ClerkTransformationsTest < Test::Unit::TestCase
   def test_transformation_of_named_value
