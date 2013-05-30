@@ -51,7 +51,7 @@ module Clerk
     # * *Returns* :
     #   - Array containing each row of data in the described structure
     def results
-      results = Array.new
+      results = []
 
       if self.class.template.has_grouped_element?
         results.concat embiggen_grouped_results @transformed_values
@@ -81,7 +81,7 @@ module Clerk
     # * *Returns* :
     #   - Hash of error messages
     def errors
-      error_messages = Hash.new
+      error_messages = {}
       @transformed_values.each_with_index do |sets, index|
         messages = sets.map { |set| set.errors.full_messages }.flatten.uniq
         error_messages[index + 1] = messages unless messages.empty?
@@ -102,7 +102,7 @@ module Clerk
     private
     def result_sets(record)
       data = record.dup
-      sets = Array.new
+      sets = []
       if self.class.template.has_grouped_element?
         grouped_data = data.select { |key, value| value.kind_of? Array }
         grouped_data.keys.each { |key| data.delete(key) }

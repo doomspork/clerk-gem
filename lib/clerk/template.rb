@@ -70,7 +70,7 @@ module Clerk
     # * *Returns* :
     #   - data structured into a Hash
     def apply(data)
-      @structured_data = Hash.new
+      @structured_data = {}
 
       @template_array.each_with_index do |value,index|
         case value
@@ -81,10 +81,10 @@ module Clerk
         when TemplateGroup
           template = value.template.to_a
 
-          data_group = Array.new
+          data_group = []
 
           data[index, data.length].each_slice(template.length) do |slice|
-            grouped = Hash.new
+            grouped = {}
             if slice.length < template.length
               slice.fill(nil, slice.length, template.length - 1)
             end

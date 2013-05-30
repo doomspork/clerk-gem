@@ -32,7 +32,7 @@ module Clerk
       end
 
       def transformations
-        @transformations ||= Hash.new { |hash, key| hash[key] = Array.new }
+        @transformations ||= Hash.new { |hash, key| hash[key] = [] }
       end
     end
 
