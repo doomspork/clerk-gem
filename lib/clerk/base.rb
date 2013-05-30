@@ -14,18 +14,21 @@ module Clerk
       self.class._result_set_klass = result_klass
     end
 
-    ##
-    # Pass data off to your Clerk for processing
+    # Public: Pass data off to your Clerk for processing
     #
     # This is the main method for giving data to Clerk which will then
     # be transformed into the structure specified by the Template and
     # according to any transformations specified for individual data
     # elements/columns.
     #
-    # * *Args* :
-    #   - +data+ -> Data which Clerk should act upon
-    # * *Returns* :
-    #   - self
+    # data - data which Clerk should act upon
+    #
+    # Examples:
+    #
+    #   my_clerk = ClerkImplementation.new
+    #   my_clerk.load %(A B C D)
+    #
+    # Returns nothing
     def load(data)
       clear_transformed_data!
       data = [data] unless data[0].kind_of? Array
@@ -40,16 +43,21 @@ module Clerk
       self
     end
 
-    ##
-    # Retrieves the transformed data from the Clerk
+    # Public: Retrieves the transformed data from the Clerk
     #
     # Use this method to retrieve the final transformed data from the
     # Clerk. This method should be called after you have verified the
     # data passes validation described in your clerk using the `valid?`
     # method.
     #
-    # * *Returns* :
-    #   - Array containing each row of data in the described structure
+    # Examples:
+    # 
+    #   my_clerk = ClerkImplementation.new
+    #   my_clerk.load %(A B C D)
+    #   my_clerk.results
+    #   # => [{:a => "A", :b => "B", :c => "C", :d => "D"}]
+    #
+    # Returns Array containing each row of data in the described structure
     def results
       results = []
 
@@ -64,22 +72,18 @@ module Clerk
       results
     end
 
-    ##
-    # Checks data against described Validators
+    # Public: Checks data against described Validators
     #
-    # * *Returns* :
-    #   - Boolean true or false
+    # Returns Boolean representing valid (true) or invalid (false)
     def valid?(*args)
       @transformed_values.all? do |sets| 
         sets.all? { |set| set.valid? } 
       end
     end
 
-    ##
-    # Used to retrieve validation error messages
+    # Public: Retrieve validation error messages
     #
-    # * *Returns* :
-    #   - Hash of error messages
+    # Returns Hash of error messages
     def errors
       error_messages = {}
       @transformed_values.each_with_index do |sets, index|
@@ -89,10 +93,21 @@ module Clerk
       error_messages
     end
 
+    # Internal: Apply the template to the loaded data
     def apply_template(data)
       self.class.template.apply(data)
     end
 
+    # Public: Define the Template with a Block
+    #
+    # Examples:
+    #
+    #   my_clerk.template do |t|
+    #     t.named :a
+    #     t.ignored
+    #   end
+    #
+    # Returns Template
     def self.template
       @template ||= Clerk::Template.new 
       yield @template if block_given?
@@ -122,10 +137,17 @@ module Clerk
       sets
     end
 
+    # Internal: Clears the internal transformed data storage
+    #
+    # Returns nothing
     def clear_transformed_data!
       @transformed_values = []
     end
 
+    # Internal: Converts internal, flattened data structure back into the
+    # expected structure for return
+    #
+    # Returns Array of Hashes
     def embiggen_grouped_results(values)
       embiggened_results = []
       values.each do |resultset|
