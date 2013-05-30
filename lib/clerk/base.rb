@@ -108,7 +108,7 @@ module Clerk
         grouped_data.keys.each { |key| data.delete(key) }
         grouped_data.each do |key, values|
           if values.empty?
-            sets.push self.class._result_set_klass.new(data.merge(Hash[key, []]))
+            sets.push self.class._result_set_klass.new(data.merge(Hash[key, {}]))
           else
             values.each do |value|
               group = Hash[key, value]
@@ -133,7 +133,13 @@ module Clerk
         resultset.each do |set|
           data = {}
           set.data.each do |key, value|
-            value = [value] if value.kind_of? Hash
+            if value.kind_of? Hash
+              if value.empty?
+                value = []
+              else 
+                value = [value] if value.kind_of? Hash
+              end
+            end
             data[key] = value
           end
           container.merge!(data) do |key, old, nue|
