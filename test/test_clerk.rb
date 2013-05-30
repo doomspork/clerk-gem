@@ -145,7 +145,7 @@ class ClerkTest < Test::Unit::TestCase
 
     data = [
       "1,Fhaemita Dewshining,Half-elf,Female,3,80".split(","),
-      "2,George,Full-elf,Male,2,20,Gold,100,Rubies,20".split(",")
+      "2,George,Elf,Male,2,20,Gold,100,Rubies,20".split(",")
     ]
 
     clerk = klass.new
@@ -160,7 +160,7 @@ class ClerkTest < Test::Unit::TestCase
       },
       {
         :name => "George",
-        :race => "Full-elf",
+        :race => "Elf",
         :gender => "Male",
         :class=> "2", 
         :loot => [

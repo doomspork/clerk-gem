@@ -3,10 +3,12 @@ module Clerk
     def transform(record)
       self.class.transformations.each do |field, transformers|
         orig_value = record.get(field)
-        transformed_value = transformers.inject(orig_value) do |memo, transformer|
-          transformer.transform(memo)
+        unless orig_value.nil?
+          transformed_value = transformers.inject(orig_value) do |memo, transformer|
+            transformer.transform(memo)
+          end
+          record.set(field, transformed_value)
         end
-        record.set(field, transformed_value)
       end
       record 
     end

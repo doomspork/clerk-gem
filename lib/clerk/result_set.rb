@@ -11,7 +11,11 @@ module Clerk
     def get(attribute)
       parts = attribute.to_s.split('/')
       parts.inject(@data) do |memo, value| 
-        memo[value.to_sym] || memo[value] 
+        if memo.key? value.to_sym
+          memo[value.to_sym]
+        elsif memo.key? value
+          memo[value] 
+        end
       end
     end
 
