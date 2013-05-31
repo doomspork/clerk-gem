@@ -8,6 +8,4 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.files       = ['lib/clerk.rb']
   s.add_dependency('activemodel', '~> 3.2.13')
-
-  s.add_development_dependency('simplecov')
 end
