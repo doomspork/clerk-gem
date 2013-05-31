@@ -73,4 +73,21 @@ class ClerkTransformationsTest < Test::Unit::TestCase
     assert_equal expected, clerk.results.first
 
   end
+
+  def test_transformations_can_be_cleared
+    klass = Class.new Clerk::Base
+    klass.template do |t|
+      t.named :a
+      t.named :b
+    end
+
+    klass.transforms :a do |value|
+      v.upcase
+    end
+
+    assert_equal klass.transformations.length, 1
+
+    klass.clear_transformations!
+    assert klass.transformations.empty?
+  end
 end
