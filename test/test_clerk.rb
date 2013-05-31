@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'clerk'
+require 'test_helper'
 
 class ClerkTest < Test::Unit::TestCase
   def test_clerk_structures_grouped_data
@@ -171,5 +170,43 @@ class ClerkTest < Test::Unit::TestCase
     ]
 
     assert_equal expected, clerk.results
+  end
+
+  def test_clerk_exposes_validation_errors
+    klass = Class.new Clerk::Base
+    klass.template do |t|
+      t.named :name
+      t.named :age
+    end
+
+    klass.validates_presence_of :age
+
+    data = [
+      "Bob,25",
+      "John,23",
+      "Phillip",
+    ].map! { |x| x.split(",") }
+
+    clerk = klass.new
+    clerk.load data
+    
+    assert clerk.invalid?
+    assert clerk.errors.has_key? 3
+  end
+
+  def test_clerk_has_no_errors_when_valid
+    klass = Class.new Clerk::Base
+    klass.template do |t|
+      t.named :a
+      t.named :b
+    end
+
+    klass.validates_presence_of :a
+
+    clerk = klass.new
+    clerk.load %w(A B)
+
+    assert clerk.valid?
+    assert clerk.errors.empty?
   end
 end
