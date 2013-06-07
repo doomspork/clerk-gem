@@ -39,6 +39,28 @@ class ClerkValidationTest < Test::Unit::TestCase
     assert clerk.invalid?
   end
 
+  def test_block_validator
+    klass = Class.new(Clerk::Base) 
+    klass.template do |t| 
+      t.named 'a'
+      t.grouped :group_name do |group|
+        group.named 'ga'
+        group.named :gb
+      end
+    end
+
+    klass.validates_each :'group_name/gb' do |record, attr, value|
+      record.errors.add(attr, 'Value cannot be nil') if value.empty?
+    end
+
+    clerk = klass.new
+    clerk.load %w(A GA GB)
+    assert clerk.valid?
+
+    clerk.load %W(A GA #{})
+    assert clerk.invalid?
+  end
+
   def test_validation_of_template_string_key_support
     klass = Class.new(Clerk::Base) 
     klass.template do |t| 

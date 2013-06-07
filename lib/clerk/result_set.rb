@@ -34,10 +34,13 @@ module Clerk
 
     def self.copy_validations_from(klass)
       klass.validators.each do |validator|
-        validates_with validator.class, validator.options.merge({:attributes => validator.attributes})
+        attributes = []
+        attributes << validator.class
+        attributes << validator.options.merge({:attributes => validator.attributes })
+        validates_with *attributes, &validator.instance_variable_get('@block')
       end
-    end
 
-    alias_method :read_attribute_for_validation, :get
+      alias_method :read_attribute_for_validation, :get
+    end
   end
 end
