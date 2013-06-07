@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'clerk/base'
+require 'test_helper'
 
 class ClerkValidationTest < Test::Unit::TestCase
   def test_validation_of_template_named_value

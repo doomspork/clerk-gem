@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'clerk/template'
+require 'test_helper'
 
 class ClerkTemplateTest < Test::Unit::TestCase
   def setup
@@ -183,6 +182,14 @@ class ClerkTemplateTest < Test::Unit::TestCase
           groupception.named :d
           groupception.named :e
         end
+      end
+    end
+  end
+
+  def test_calling_invalid_method_on_group_raises_error
+    assert_raise NoMethodError do
+      @template.grouped(:a) do |group|
+        group.method_does_not_exist
       end
     end
   end
