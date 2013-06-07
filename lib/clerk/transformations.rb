@@ -17,7 +17,7 @@ module Clerk
       def transforms(*fields, &block)
         klz = Class.new(BlockTransformer)
         klz.block(&block)
-        transforms_with klz, *fields
+        transforms_with(klz, *fields)
       end
 
       def transforms_with(klass, *fields)
@@ -28,7 +28,7 @@ module Clerk
       end
 
       def clear_transformations!
-        self.transformations.clear
+        transformations.clear
       end
 
       def transformations
