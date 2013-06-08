@@ -106,8 +106,9 @@ module Clerk
             slice.each_with_index do |element,idx|
               grouped[template[idx]] = element
             end
-
-            data_group << grouped
+            unless grouped.all? { |k, v| v.nil? }
+              data_group << grouped
+            end
           end
 
           @structured_data[value.name] = data_group
