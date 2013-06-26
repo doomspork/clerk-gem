@@ -81,4 +81,23 @@ class ClerkValidationTest < Test::Unit::TestCase
     assert clerk.invalid?
   end
 
+  def test_validation_of_multiple_errors_in_a_set
+    klass = Class.new(Clerk::Base) 
+    klass.template do |t| 
+      t.named 'a'
+      t.grouped :group_name do |group|
+        group.named 'ga'
+        group.named :gb
+      end
+    end
+
+    klass.validates_presence_of 'a'
+    klass.validates_presence_of :'group_name/ga'
+
+    clerk = klass.new
+    clerk.load [%W(A #{} GB), %W(#{} GA GB)]
+    assert clerk.invalid?
+    assert_equal 2, clerk.errors.size 
+  end
+
 end

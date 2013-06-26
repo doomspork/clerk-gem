@@ -76,9 +76,13 @@ module Clerk
     #
     # Returns Boolean representing valid (true) or invalid (false)
     def valid?(*args)
-      @transformed_values.all? do |sets| 
-        sets.all? { |set| set.valid? } 
+      valid = true
+      @transformed_values.each do |sets| 
+        sets.each do |set| 
+          valid = false unless set.valid?
+        end
       end
+      valid
     end
 
     # Public: Retrieve validation error messages
